@@ -1,0 +1,162 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: API Testing and Documentation
+paths:
+  /register/:
+    post:
+      summary: Register a new user
+      parameters:
+        - name: user
+
+          in: body
+          description: User object containing name, email, username, and password
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: User Registered Successfully
+        "400":
+          description: Bad request. User already exists or invalid input.
+
+  /login/:
+    post:
+      summary: Login to the application
+      parameters:
+        - name: username
+          in: body
+          description: User's username and password
+          required: true
+          schema:
+            $ref: "#/definitions/login"
+      responses:
+        "200":
+          description: Login successful. JWT token generated.
+        "400":
+          description: Invalid User or Invalid Password.
+  /protected/:
+    get:
+      summary: Access protected route
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Protected Route accessed successfully
+        "400":
+          description: Unauthorized or Invalid JWT Token
+  /data/:
+    get:
+      summary: Retrieve data from API with filtering
+      parameters:
+        - name: category
+          in: query
+          description: Category to filter the data
+          required: false
+          type: string
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          required: false
+          type: integer
+        - name: allData
+          in: query
+          description: Flag to fetch all data without filtering
+          required: false
+          type: boolean
+      responses:
+        "200":
+          description: Data retrieved successfully
+          schema:
+            type: object
+            properties:
+              filteredData:
+                type: array
+                items:
+                  $ref: "#/definitions/DataItem"
+        "400":
+          description: Internal server error
+  /balance/{address}:
+    get:
+      summary: Get balance of Ethereum address with Authorization
+      parameters:
+        - name: address
+          in: path
+          description: Ethereum address
+          required: true
+          type: string
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              balance:
+                type: string
+                description: Balance in Ether
+        "400":
+          description: Invalid Ethereum address
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+        "500":
+          description: Internal server error
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: Use 'Bearer' followed by the JWT token
+definitions:
+  DataItem:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      category:
+        type: string
+  User:
+    type: object
+    properties:
+      name:
+        type: string
+        example: abc
+      email:
+        type: string
+        example: abc12@gmail.com
+      username:
+        type: string
+        example: abc_hey
+      password:
+        type: string
+        example: Abcd$56
+    required:
+      - name
+      - email
+      - username
+      - password
+  login:
+    type: object
+    properties:
+      username:
+        type: string
+        example: sample_username
+      password:
+        type: string
+        example: sample@345
+    required:
+      - username
+      - password
