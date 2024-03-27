@@ -140,7 +140,7 @@ app.get("/balance/:address", verifyToken, async (request, response) => {
     const balance = await web3.eth.getBalance(address);
     const totBalanceEth = web3.utils.fromWei(balance, "ether");
     response.send({ balance: totBalanceEth });
-  } catch (error) {
+  } catch (err) {
     response
       .status(500)
       .send({ error: `Internal server error: ${err.message}` });
